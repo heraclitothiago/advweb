@@ -1,0 +1,9 @@
+.no-border {
+    border: none;
+}
+
+.no-border:focus {
+    border-color: inherit;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+}
