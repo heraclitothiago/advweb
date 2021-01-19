@@ -21,10 +21,10 @@ USE `advformdata`;
 -- Copiando estrutura para tabela advformdata.cliente
 DROP TABLE IF EXISTS `cliente`;
 CREATE TABLE IF NOT EXISTS `cliente` (
-  `id` int(11) NOT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `nome` varchar(255) NOT NULL,
   `nascimento` datetime NOT NULL,
-  `sexo` varchar(255) NOT NULL DEFAULT '',
+  `sexo` varchar(255) NOT NULL,
   `nacionalidade` varchar(255) NOT NULL,
   `estado_civil` varchar(255) NOT NULL,
   `profissao` varchar(255) NOT NULL,
@@ -40,16 +40,23 @@ CREATE TABLE IF NOT EXISTS `cliente` (
 -- Copiando estrutura para tabela advformdata.contatos
 DROP TABLE IF EXISTS `contatos`;
 CREATE TABLE IF NOT EXISTS `contatos` (
-  `id` int(11) NOT NULL,
-  `ref_cliente` int(11) NOT NULL,
-  `telefone` varchar(255) DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `contato_ref` int(11) NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `telefone` varchar(255) NOT NULL,
   `facebook` varchar(255) DEFAULT NULL,
   `messenger` varchar(255) DEFAULT NULL,
   `instagram` varchar(255) DEFAULT NULL,
   `twitter` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `ref_contato_cliente` (`ref_cliente`),
-  CONSTRAINT `ref_contato_cliente` FOREIGN KEY (`ref_cliente`) REFERENCES `cliente` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
+  UNIQUE KEY `email` (`email`),
+  UNIQUE KEY `telefone` (`telefone`),
+  UNIQUE KEY `facebook` (`facebook`),
+  UNIQUE KEY `messenger` (`messenger`),
+  UNIQUE KEY `instagram` (`instagram`),
+  UNIQUE KEY `twitter` (`twitter`),
+  KEY `contato_cliente` (`contato_ref`),
+  CONSTRAINT `contato_cliente` FOREIGN KEY (`contato_ref`) REFERENCES `cliente` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- Exportação de dados foi desmarcado.
@@ -57,8 +64,8 @@ CREATE TABLE IF NOT EXISTS `contatos` (
 -- Copiando estrutura para tabela advformdata.endereco
 DROP TABLE IF EXISTS `endereco`;
 CREATE TABLE IF NOT EXISTS `endereco` (
-  `id` int(11) NOT NULL,
-  `ref_cliente` int(11) NOT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `endereco_ref` int(11) NOT NULL,
   `logradouro` varchar(255) NOT NULL,
   `numero` varchar(255) NOT NULL,
   `complemento` varchar(255) DEFAULT NULL,
@@ -67,8 +74,8 @@ CREATE TABLE IF NOT EXISTS `endereco` (
   `uf` varchar(255) NOT NULL,
   `cep` varchar(255) NOT NULL,
   PRIMARY KEY (`id`),
-  KEY `ref_endereco_cliente` (`ref_cliente`),
-  CONSTRAINT `ref_endereco_cliente` FOREIGN KEY (`ref_cliente`) REFERENCES `cliente` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
+  KEY `endereco_ref` (`endereco_ref`),
+  CONSTRAINT `endereco_cliente` FOREIGN KEY (`endereco_ref`) REFERENCES `cliente` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- Exportação de dados foi desmarcado.
@@ -76,15 +83,15 @@ CREATE TABLE IF NOT EXISTS `endereco` (
 -- Copiando estrutura para tabela advformdata.rg
 DROP TABLE IF EXISTS `rg`;
 CREATE TABLE IF NOT EXISTS `rg` (
-  `id` int(11) NOT NULL,
-  `ref_cliente` int(11) NOT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `rg_ref` int(11) NOT NULL,
   `numero_rg` varchar(255) NOT NULL,
   `expedicao_rg` varchar(255) NOT NULL,
   `expedidor_rg` varchar(255) NOT NULL,
   `uf_expedidor` varchar(255) NOT NULL,
   PRIMARY KEY (`id`),
-  KEY `ref_doc_cliente` (`ref_cliente`),
-  CONSTRAINT `ref_doc_cliente` FOREIGN KEY (`ref_cliente`) REFERENCES `cliente` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
+  KEY `rg_ref` (`rg_ref`) USING BTREE,
+  CONSTRAINT `rg_cliente` FOREIGN KEY (`rg_ref`) REFERENCES `cliente` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- Exportação de dados foi desmarcado.
