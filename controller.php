@@ -13,6 +13,11 @@ if (!empty($postData['formSerialize'])) {
     parse_str($postData['formSerialize'], $postData);
 }
 
+
+require_once __DIR__ . '/config.php';
+
+$read = new \CRUD\Read;
+
 switch ($action) {
     case 'data-user':
         if (empty($postData['nome'])) {
@@ -98,6 +103,14 @@ switch ($action) {
             $json['errorMessage'] = 'CPF inválido, por favor, tente novamente!';
             break;
         }
+
+        $read->read('cliente', "WHERE cpf = :cpf", "cpf={$postData['cpf']}");
+        if ($read->getResult()) {
+            $json['error'] = true;
+            $json['errorMessage'] = 'Esse CPF já está em uso, por favor, informe outro ou contate o suporte!';
+            break;
+        }
+
         if (empty($postData['numero_rg'])) {
             $json['error'] = true;
             $json['errorMessage'] = 'Por favor, informe o número do seu documento de identificação!';
@@ -113,8 +126,6 @@ switch ($action) {
             $json['errorMessage'] = 'Por favor, selecione o Estado de expedição de seu documento de identificação.';
             break;
         }
-
-
         if (empty($postData['expedicao_rg'])) {
             $json['error'] = true;
             $json['errorMessage'] = 'Por favor, digite a data de expedição do seu documento de identificação!';
@@ -124,6 +135,7 @@ switch ($action) {
         $_SESSION['wizard']['cpf'] = $postData['cpf'];
         $_SESSION['wizard']['numero_rg'] = $postData['numero_rg'];
         $_SESSION['wizard']['expedidor_rg'] = $postData['expedidor_rg'];
+        $_SESSION['wizard']['uf_expedidor'] = $postData['uf_expedidor'];
         $_SESSION['wizard']['expedicao_rg'] = $postData['expedicao_rg'];
         $json['success'] = true;
         break;
@@ -183,16 +195,86 @@ switch ($action) {
             $json['errorMessage'] = 'Por favor, informe um e-mail válido!';
             break;
         }
-
+        $read->read('cliente', "WHERE email = :email", "email={$postData['email']}");
+        if ($read->getResult()) {
+            $json['error'] = true;
+            $json['errorMessage'] = 'Esse e-mail já está em uso, por favor, informe outro!';
+            break;
+        }
         if (empty($postData['telefone'])) {
             $json['error'] = true;
             $json['errorMessage'] = 'Por favor, informe o seu telefone!';
             break;
         }
-
+        $read->read('contatos', "WHERE telefone = :telefone", "telefone={$postData['telefone']}");
+        if ($read->getResult()) {
+            $json['error'] = true;
+            $json['errorMessage'] = 'Esse telefone já está em uso, por favor, informe outro!';
+            break;
+        }
 
         $_SESSION['wizard']['email'] = $postData['email'];
         $_SESSION['wizard']['telefone'] = $postData['telefone'];
+
+        $saveCliente = [
+            'nome' => $_SESSION['wizard']['nome'],
+            'sexo' => $_SESSION['wizard']['sexo'],
+            'nascimento' => $_SESSION['wizard']['nascimento'],
+            'nacionalidade' => $_SESSION['wizard']['nacionalidade'],
+            'estado_civil' => $_SESSION['wizard']['estado_civil'],
+            'profissao' => $_SESSION['wizard']['profissao'],
+            //documentos pessoais
+            'cpf' => $_SESSION['wizard']['cpf'],
+            //endereço
+            //contatos
+            'email' => $_SESSION['wizard']['email'],
+
+        ];
+
+        $createCLiente = new \CRUD\Create;
+        $createCLiente->create('cliente', $saveCliente);
+        $read->read('cliente', "WHERE email = :email", "email={$saveCliente['email']}");
+        $idCliente = $read->getResult()[0]['id'];
+
+        /**
+         * Salva os dados do RG do cliente
+         */
+        $saveRg = [
+            'rg_ref' => $idCliente,
+            'numero_rg' => $_SESSION['wizard']['numero_rg'],
+            'expedidor_rg' => $_SESSION['wizard']['expedidor_rg'],
+            'uf_expedidor' => $_SESSION['wizard']['uf_expedidor'],
+            'expedicao_rg' => $_SESSION['wizard']['expedicao_rg']
+        ];
+        $createRg = new \CRUD\Create;
+        $createRg->create('rg', $saveRg);
+
+        /**
+         * Salva os dados de endereço do cliente
+         */
+        $saveEndereco = [
+            'endereco_ref' => $idCliente,
+            'logradouro' => $_SESSION['wizard']['logradouro'],
+            'numero' => $_SESSION['wizard']['numero'],
+            'complemento' => $_SESSION['wizard']['complemento'],
+            'bairro' => $_SESSION['wizard']['bairro'],
+            'cidade' => $_SESSION['wizard']['cidade'],
+            'uf' => $_SESSION['wizard']['uf'],
+            'cep' => $_SESSION['wizard']['cep']
+        ];
+        $createEndereco = new \CRUD\Create;
+        $createEndereco->create('endereco', $saveEndereco);
+
+        /**
+         * Salva os dados de contato do cliente
+         */
+        $saveContatos = [
+            'contato_ref' => $idCliente,
+            'telefone' => $_SESSION['wizard']['telefone']
+        ];
+        $createContato = new \CRUD\Create;
+        $createContato->create('contatos', $saveContatos);
+
 
         $json['redirect'] = 'http://localhost/form-wizard/prospeccao/main.php';
         $json['finish'] = true;
