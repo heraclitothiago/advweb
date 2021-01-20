@@ -43,8 +43,8 @@
         <!-- Nacionalidade, Estado Civil, profissão -->
         <div class="data-about form-step" style="display: none;">
             <form action="" method="post" class="form-wizard" autocomplete="off" data-action="data-about">
-            <h1>Muito bem, informe os dados complementares a seguir</h1>
-            <p>Só mais alguns passos para finalizarmos a conclusão do formulário =)</p>
+                <h1>Muito bem, informe os dados complementares a seguir</h1>
+                <p>Só mais alguns passos para finalizarmos a conclusão do formulário =)</p>
                 <h1></h1>
                 <div class="mb-3">
                     <label for="nacionalidade">Qual a sua nacionalidade?</label>
@@ -149,6 +149,8 @@
         <!-- Endereço -->
         <div class="data-address form-step" style="display: none;">
             <form action="" method="post" class="form-wizard" autocomplete="off" data-action="data-address">
+                <h1>Já estamos terminando</h1>
+                <p>Informe o seu CEP. Se você não souber, consulte <a href="https://buscacepinter.correios.com.br/app/localidade_logradouro/index.php" target="_blank">aqui</a></p>
                 <label class="form-label" for="cep">Digite o seu CEP</label>
                 <div class="input-group mb-3">
                     <input type="text" class="form-control" name="cep" id="cep">
@@ -200,6 +202,8 @@
         <!-- Dados de Contato -->
         <div class="data-contact form-step" style="display: none;">
             <form action="" method="post" class="form-wizard" autocomplete="off" data-action="data-contact">
+                <h1>Já estamos terminando</h1>
+                <p>Informe seu telefone e email para finalizarmos, e clique em <i>finalizar</i></p>
                 <table class="table table-sm table-borderless">
                     <tbody>
                         <tr colspan="3">
